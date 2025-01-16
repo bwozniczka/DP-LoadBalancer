@@ -14,9 +14,9 @@ public class DatabaseFacade {
     private Connection mysqlConnection;
 
     public void connect() throws SQLException {
-        postgresConnection1 = createPostgresConnection("postgres1", 5432, "db1", "user1", "password1");
-        postgresConnection2 = createPostgresConnection("postgres2", 5432, "db2", "user2", "password2");
-        mysqlConnection = createMysqlConnection("mysql", 3306, "db3", "user3", "password3");
+        postgresConnection1 = createPostgresConnection("localhost", 5432, "db1", "user1", "password1");
+        postgresConnection2 = createPostgresConnection("localhost", 5433, "db2", "user2", "password2");
+        mysqlConnection = createMysqlConnection("localhost", 3306, "db3", "user3", "password3");
     }
 
     private Connection createPostgresConnection(String host, int port, String dbName, String user, String password) throws SQLException {
