@@ -8,7 +8,9 @@ import java.sql.SQLException;
 // Design Pattern: Facade
 //****************************
 
-public class DatabaseFacade {
+// TODO: don't return objects, rather implement function to query...
+// TODO: Find a way to "index" connection (dictionary?)
+public class DatabaseConnectionManagerFacade {
     private Connection postgresConnection1;
     private Connection postgresConnection2;
     private Connection mysqlConnection;
