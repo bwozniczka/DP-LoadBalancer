@@ -1,16 +1,21 @@
 package com.loadbalancer.factory;
 
-import com.loadbalancer.connection.DatabaseConnection;
-import com.loadbalancer.connection.MySQLConnection;
-import com.loadbalancer.connection.PostgreSQLConnection;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+import com.loadbalancer.util.DatabaseType;
 
 public class DatabaseConnectionFactory {
-    public static DatabaseConnection createConnection(String type, String host, int port, String dbName, String user, String password) {
+    public static Connection createConnection(DatabaseType type, String host, int port, String dbName, String user, String password) throws SQLException {
+        String url;
         switch (type) {
-            case "MySQL":
-                return new MySQLConnection(host, port, dbName, user, password);
-            case "PostgreSQL":
-                return new PostgreSQLConnection(host, port, dbName, user, password);
+            case MYSQL:
+                url = String.format("jdbc:mysql://%s:%d/%s", host, port, dbName);
+                return DriverManager.getConnection(url, user, password);
+            case POSTGRESQL:
+                url = String.format("jdbc:postgresql://%s:%d/%s", host, port, dbName);
+                return DriverManager.getConnection(url, user, password);
             default:
                 throw new IllegalArgumentException("Unknown database type");
         }

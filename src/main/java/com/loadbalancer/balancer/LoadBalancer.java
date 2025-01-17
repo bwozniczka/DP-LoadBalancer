@@ -1,32 +1,30 @@
 package com.loadbalancer.balancer;
 
-import com.loadbalancer.connection.DatabaseConnection;
-import java.util.List;
+import com.loadbalancer.facade.DatabaseConnectionManagerFacade;
+
+import java.sql.Connection;
+
+//****************************
+// Design Pattern: Singleton (Bill Pugh implementation)
+//****************************
 
 public class LoadBalancer {
-    private static LoadBalancer instance;
-    private List<DatabaseConnection> databases;
+    private DatabaseConnectionManagerFacade databaseManager;
     private LoadBalancingStrategy strategy;
 
-    // Private constructor to prevent instantiation
     private LoadBalancer() {}
 
-    // Public method to provide access to the single instance
-    public static synchronized LoadBalancer getInstance() {
-        if (instance == null) {
-            instance = new LoadBalancer();
-        }
-        return instance;
+    private static class LoadBalancerHelper {
+        private static final LoadBalancer INSTANCE = new LoadBalancer();
     }
 
-    // Method to set the load balancing strategy
-    public void setStrategy(LoadBalancingStrategy strategy) {
+    public static LoadBalancer getInstance() {
+        return LoadBalancerHelper.INSTANCE;
+    }
+
+    public void initialize(LoadBalancingStrategy strategy, DatabaseConnectionManagerFacade databaseManager) {
         this.strategy = strategy;
-    }
-
-    // Method to set the list of databases
-    public void setDatabases(List<DatabaseConnection> databases) {
-        this.databases = databases;
+        this.databaseManager = databaseManager;
     }
 
     // Method to synchronize queries across all databases
@@ -37,7 +35,7 @@ public class LoadBalancer {
     // }
 
     // Method to get a database for SELECT operations based on the strategy
-    public DatabaseConnection getDatabaseToQuery() {
-        return strategy.chooseDatabase(databases);
+    public Connection getDatabaseToQuery() {
+        return strategy.chooseDatabase(databaseManager.getConnections());
     }
 }

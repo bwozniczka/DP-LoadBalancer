@@ -1,55 +1,48 @@
 package com.loadbalancer.facade;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.loadbalancer.factory.DatabaseConnectionFactory;
+import com.loadbalancer.util.DatabaseType;
 
 //****************************
 // Design Pattern: Facade
 //****************************
 
-// TODO: don't return objects, rather implement function to query...
-// TODO: Find a way to "index" connection (dictionary?)
 public class DatabaseConnectionManagerFacade {
-    private Connection postgresConnection1;
-    private Connection postgresConnection2;
-    private Connection mysqlConnection;
+    private List<Connection> connections;
 
-    public void connect() throws SQLException {
-        postgresConnection1 = createPostgresConnection("localhost", 5432, "db1", "user1", "password1");
-        postgresConnection2 = createPostgresConnection("localhost", 5433, "db2", "user2", "password2");
-        mysqlConnection = createMysqlConnection("localhost", 3306, "db3", "user3", "password3");
+    public DatabaseConnectionManagerFacade() {
+        connections = new ArrayList<>();
     }
 
-    private Connection createPostgresConnection(String host, int port, String dbName, String user, String password) throws SQLException {
-        String url = String.format("jdbc:postgresql://%s:%d/%s", host, port, dbName);
-        return DriverManager.getConnection(url, user, password);
+    // mock function
+    public void addSampleConnections() throws SQLException {
+        connections.add(connect(DatabaseType.POSTGRESQL, "localhost", 5432, "db1", "user1", "password1"));
+        connections.add(connect(DatabaseType.POSTGRESQL, "localhost", 5433, "db2", "user2", "password2"));
+        connections.add(connect(DatabaseType.MYSQL, "localhost", 3306, "db3", "user3", "password3"));
     }
 
-    private Connection createMysqlConnection(String host, int port, String dbName, String user, String password) throws SQLException {
-        String url = String.format("jdbc:mysql://%s:%d/%s", host, port, dbName);
-        return DriverManager.getConnection(url, user, password);
+    public Connection connect(DatabaseType type, String host, int port, String dbName, String user, String password) throws SQLException {
+        return DatabaseConnectionFactory.createConnection(type, host, port, dbName, user, password);
     }
 
-    public void close() {
-        try {
-            if (postgresConnection1 != null && !postgresConnection1.isClosed()) postgresConnection1.close();
-            if (postgresConnection2 != null && !postgresConnection2.isClosed()) postgresConnection2.close();
-            if (mysqlConnection != null && !mysqlConnection.isClosed()) mysqlConnection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public void disconnect() {
+        for (Connection connection : connections) {
+            try {
+                if (connection != null && !connection.isClosed()) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public Connection getPostgresConnection1() {
-        return postgresConnection1;
-    }
-
-    public Connection getPostgresConnection2() {
-        return postgresConnection2;
-    }
-
-    public Connection getMysqlConnection() {
-        return mysqlConnection;
+    public List<Connection> getConnections() {
+        return connections;
     }
 }
