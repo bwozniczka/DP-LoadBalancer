@@ -7,6 +7,7 @@ import com.loadbalancer.balancer.LoadBalancer;
 import com.loadbalancer.balancer.RoundRobinStrategy;
 import com.loadbalancer.connection.DatabaseConnectionManagerFacade;
 import com.loadbalancer.connection.DatabaseConnectionWrapper;
+import com.loadbalancer.util.Log;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
@@ -17,10 +18,17 @@ public class Main {
 
         LoadBalancer loadBalancer = LoadBalancer.getInstance();
         loadBalancer.initialize(roundRobinStrategy, databaseFacade);
-        
+        Log.info("LoadBalancer initialized successfully.");
+
+        // Test the load balancer for UPDATING
+        // loadBalancer.getDatabaseConnections().forEach(connection -> {
+        //     connection.executeUpdate("INSERT INTO Users (username, password, email) VALUES ('userek', 'passwordzik', 'userek@example.com')");
+        // });
+
+        // Test the load balancer for SELECT
         for (int i = 0; i < 10; i++) {
             DatabaseConnectionWrapper connection = loadBalancer.getDatabaseConnection();
-            List<String> entries = connection.executeQuery("SELECT * FROM Users where id=1");
+            List<String> entries = connection.executeQuery("SELECT * FROM Users");
             for (String entry : entries) {
                 System.out.println(entry);
             }

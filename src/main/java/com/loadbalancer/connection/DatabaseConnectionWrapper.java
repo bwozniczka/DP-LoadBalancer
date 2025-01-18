@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-
 import java.sql.Statement;
+import com.loadbalancer.util.Log;
 
 public class DatabaseConnectionWrapper {
     private Connection connection;
@@ -16,19 +16,18 @@ public class DatabaseConnectionWrapper {
 
     public DatabaseConnectionWrapper(Connection connection) {
         this.connection = connection;
+        Log.info("DatabaseConnectionWrapper initialized with connection: " + connection);
     }
 
-    // public void connect() {
-
-    // }
-
+    // Disconnects the connection
     public void disconnect() {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
+                Log.info("Connection closed successfully.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Log.error("Error while closing connection: " + e.getMessage());
         }
     }
 
@@ -37,18 +36,20 @@ public class DatabaseConnectionWrapper {
     * If the query fails, it is added to the queries queue.
     */
     public boolean executeUpdate(String query) {
-        executeQueuedQuries();
+        executeQueuedQueries();
         if (!queries.isEmpty()){
             queries.add(query);
+            Log.warn("Query failed and added to queue: " + query);
             return false;
         }
 
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(query);
+            Log.info("Query executed successfully: " + query);
             return true;
         } catch (SQLException e) {
             queries.add(query);
-            e.printStackTrace();
+            Log.error("Query failed, added to queue: " + query + ". Error: " + e.getMessage());
             return false;
         }
     }
@@ -58,16 +59,16 @@ public class DatabaseConnectionWrapper {
      * If the query fails, it returns null.
      */
     public List<String> executeQuery(String query) {
-        System.out.println("Executing query: " + query);
+        Log.info("Executing query: " + query);
 
-        executeQueuedQuries();
+        executeQueuedQueries();
         if (!queries.isEmpty()){
-            System.out.println("Query added to queue: " + query);
+            Log.warn("Query added to queue due to failure: " + query);
             return null;
         }
 
         try (Statement statement = connection.createStatement()) {
-            System.out.println("Query executed: " + query);
+            Log.info("Query executed: " + query);
 
             ResultSet resultSet = statement.executeQuery(query);
             int columnCount = resultSet.getMetaData().getColumnCount();
@@ -83,22 +84,23 @@ public class DatabaseConnectionWrapper {
                 output.add(record);
             }
 
+            Log.info("Query returned results.");
             return output;
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Query failed: " + query);
+            Log.error("Query failed: " + query + ". Error: " + e.getMessage());
             return null;
         }
     }
 
-    private void executeQueuedQuries(){
+    private void executeQueuedQueries(){
         while (!queries.isEmpty()) {
             String query = queries.poll();
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate(query);
+                Log.info("Queued query executed: " + query);
             } catch (SQLException e) {
-                e.printStackTrace();
+                Log.error("Error executing queued query: " + query + ". Error: " + e.getMessage());
             }
         }
     }
