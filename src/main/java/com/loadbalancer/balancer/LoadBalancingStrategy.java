@@ -1,8 +1,9 @@
 package com.loadbalancer.balancer;
 
-import java.sql.Connection;
 import java.util.List;
 
+import com.loadbalancer.connection.DatabaseConnectionWrapper;
+
 public interface LoadBalancingStrategy {
-    Connection chooseDatabase(List<Connection> databases);
+    DatabaseConnectionWrapper chooseDatabase(List<DatabaseConnectionWrapper> databases);
 }

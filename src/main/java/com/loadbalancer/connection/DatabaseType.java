@@ -1,4 +1,4 @@
-package com.loadbalancer.util;
+package com.loadbalancer.connection;
 
 public enum DatabaseType {
     MYSQL,

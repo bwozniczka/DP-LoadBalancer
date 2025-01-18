@@ -1,8 +1,9 @@
 package com.loadbalancer.balancer;
 
-import com.loadbalancer.facade.DatabaseConnectionManagerFacade;
+import java.util.List;
 
-import java.sql.Connection;
+import com.loadbalancer.connection.DatabaseConnectionManagerFacade;
+import com.loadbalancer.connection.DatabaseConnectionWrapper;
 
 //****************************
 // Design Pattern: Singleton (Bill Pugh implementation)
@@ -28,14 +29,12 @@ public class LoadBalancer {
     }
 
     // Method to synchronize queries across all databases
-    // public void synchronizeQuery(String query) {
-    //     for (DatabaseConnection db : databases) {
-    //         db.executeQuery(query);
-    //     }
-    // }
+    public List<DatabaseConnectionWrapper> getDatabaseConnections() {
+        return databaseManager.getConnections();
+    }
 
     // Method to get a database for SELECT operations based on the strategy
-    public Connection getDatabaseToQuery() {
+    public DatabaseConnectionWrapper getDatabaseConnection() {
         return strategy.chooseDatabase(databaseManager.getConnections());
     }
 }

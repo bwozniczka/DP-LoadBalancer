@@ -1,12 +1,12 @@
 package com.loadbalancer.main;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import com.loadbalancer.balancer.LoadBalancer;
 import com.loadbalancer.balancer.RoundRobinStrategy;
-import com.loadbalancer.facade.DatabaseConnectionManagerFacade;
+import com.loadbalancer.connection.DatabaseConnectionManagerFacade;
+import com.loadbalancer.connection.DatabaseConnectionWrapper;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
@@ -19,18 +19,11 @@ public class Main {
         loadBalancer.initialize(roundRobinStrategy, databaseFacade);
         
         for (int i = 0; i < 10; i++) {
-            Connection connection = loadBalancer.getDatabaseToQuery();
-            ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM Users");
-            
-            int columnCount = resultSet.getMetaData().getColumnCount();
-
-            while (resultSet.next()) {
-                for (int j = 1; j <= columnCount; j++) {
-                    System.out.print(resultSet.getString(j) + "\t");
-                }
-                System.out.println();
+            DatabaseConnectionWrapper connection = loadBalancer.getDatabaseConnection();
+            List<String> entries = connection.executeQuery("SELECT * FROM Users where id=1");
+            for (String entry : entries) {
+                System.out.println(entry);
             }
         }
-
     }
 }
