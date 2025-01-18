@@ -16,6 +16,7 @@ import java.sql.Statement;
 
 public class DatabaseConnectionWrapper {
     private static Logger logger = LoggerFactory.getLogger(DatabaseConnectionWrapper.class);
+    
     private Connection connection;
     private Queue<String> queries = new LinkedList<>();
     private String url;

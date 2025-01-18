@@ -3,6 +3,7 @@ package com.loadbalancer.proxy;
 import com.loadbalancer.balancer.LoadBalancer;
 import com.loadbalancer.connection.DatabaseConnectionWrapper;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -14,13 +15,22 @@ import org.slf4j.LoggerFactory;
 
 public class DatabaseProxy {
     private static Logger logger = LoggerFactory.getLogger(DatabaseProxy.class);
+    
     private LoadBalancer loadBalancer;
 
     public DatabaseProxy(LoadBalancer loadBalancer) {
         this.loadBalancer = loadBalancer;
     }
 
-    public boolean executeUpdate(String query) {
+    public List<String> execute(String query) {
+        if (query.toLowerCase().contains("select")) {
+            return executeQuery(query);
+        } else {
+            return executeUpdate(query) ? Arrays.asList("Success") : Arrays.asList("Failed");
+        }
+    }
+
+    private boolean executeUpdate(String query) {
         logger.info("Executing update query through proxy: " + query);
         boolean success = true;
         for (DatabaseConnectionWrapper connection : loadBalancer.getDatabaseConnections()) {
@@ -31,7 +41,7 @@ public class DatabaseProxy {
         return success;
     }
 
-    public List<String> executeQuery(String query) {
+    private List<String> executeQuery(String query) {
         logger.info("Executing select query through proxy: " + query);
         DatabaseConnectionWrapper connection = loadBalancer.getDatabaseConnection();
         return connection.executeQuery(query);

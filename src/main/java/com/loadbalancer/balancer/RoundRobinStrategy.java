@@ -9,6 +9,7 @@ import com.loadbalancer.connection.DatabaseConnectionWrapper;
 
 public class RoundRobinStrategy implements LoadBalancingStrategy {
     private static Logger logger = LoggerFactory.getLogger(RoundRobinStrategy.class);
+    
     private int currentIndex = 0;
 
     @Override

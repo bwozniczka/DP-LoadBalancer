@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 public class LoadBalancer {
     private static Logger logger = LoggerFactory.getLogger(LoadBalancer.class);
+    
     private DatabaseConnectionManagerFacade databaseManager;
     private LoadBalancingStrategy strategy;
 

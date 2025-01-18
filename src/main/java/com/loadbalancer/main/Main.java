@@ -29,19 +29,19 @@ public class Main {
         // ---------------- Below are operations on databases ----------------
 
         // Clear users table
-        databaseProxy.executeUpdate("DELETE FROM Users");
+        databaseProxy.execute("DELETE FROM Users");
 
         // Test the load balancer for UPDATING
-        databaseProxy.executeUpdate("INSERT INTO Users (username, password, email) VALUES ('user1', 'pass1', 'user1@example.com')");
+        databaseProxy.execute("INSERT INTO Users (username, password, email) VALUES ('user1', 'pass1', 'user1@example.com')");
 
         Thread.sleep(10000);
 
         // Test the load balancer for UPDATING
-        databaseProxy.executeUpdate("INSERT INTO Users (username, password, email) VALUES ('user12', 'pass12', 'user12@example.com')");
+        databaseProxy.execute("INSERT INTO Users (username, password, email) VALUES ('user12', 'pass12', 'user12@example.com')");
 
         // Test the load balancer for SELECT
         while (true) {
-            List<String> entries = databaseProxy.executeQuery("SELECT * FROM Users");
+            List<String> entries = databaseProxy.execute("SELECT * FROM Users");
             if (entries != null){
                 for (String entry : entries) {
                     System.out.println(entry);
