@@ -8,7 +8,7 @@
 
     <!-- <logger name="com.mysql.cj.protocol.FullReadInputStream" level="OFF" /> -->
 
-    <root level="debug">
+    <root level="OFF">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

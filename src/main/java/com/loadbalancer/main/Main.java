@@ -2,6 +2,9 @@ package com.loadbalancer.main;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Scanner;
+
+import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,32 +29,14 @@ public class Main {
 
         DatabaseProxy databaseProxy = new DatabaseProxy(loadBalancer);
 
-        // ---------------- Below are operations on databases ----------------
+        // // ---------------- Below are operations on databases ----------------
+        // databaseProxy.execute("INSERT INTO Users (username, password, email) VALUES ('user1', 'pass1', 'user1@example.com')");
+        // databaseProxy.execute("DELETE FROM Users");
 
-        // Clear users table
-        databaseProxy.execute("DELETE FROM Users");
-
-        // Test the load balancer for UPDATING
-        databaseProxy.execute("INSERT INTO Users (username, password, email) VALUES ('user1', 'pass1', 'user1@example.com')");
-
-        Thread.sleep(10000);
-
-        // Test the load balancer for UPDATING
-        databaseProxy.execute("INSERT INTO Users (username, password, email) VALUES ('user12', 'pass12', 'user12@example.com')");
-
-        // Test the load balancer for SELECT
-        while (true) {
-            List<String> entries = databaseProxy.execute("SELECT * FROM Users");
-            if (entries != null){
-                for (String entry : entries) {
-                    System.out.println(entry);
-                }
-                System.out.println();
-            } else {
-                logger.error("Failed to retrieve entries from the database.");
-            }
-
-            Thread.sleep(2000);
-        }
+        // Create and display the main frame
+        SwingUtilities.invokeLater(() -> {
+            MainFrame mainFrame = new MainFrame(databaseFacade, databaseProxy);
+            mainFrame.setVisible(true);
+        });
     }
 }

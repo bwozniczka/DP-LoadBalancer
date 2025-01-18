@@ -102,4 +102,15 @@ public class DatabaseConnectionManagerFacade {
     public List<DatabaseConnectionWrapper> getConnections() {
         return connections;
     }
+
+    public String getConnectionStatus() {
+        StringBuilder status = new StringBuilder();
+        for (DatabaseConnectionWrapper connection : connections) {
+            status.append(connection.getRecognizableName())
+                  .append(" - ")
+                  .append(connection.isUp() ? "up" : "down")
+                  .append("\n");
+        }
+        return status.toString();
+    }
 }

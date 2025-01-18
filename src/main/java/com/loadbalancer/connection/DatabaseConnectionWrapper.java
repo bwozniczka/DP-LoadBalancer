@@ -18,17 +18,19 @@ public class DatabaseConnectionWrapper {
     private static Logger logger = LoggerFactory.getLogger(DatabaseConnectionWrapper.class);
     
     private boolean isUp;
+    private String recognizableName;
     private Connection connection;
     private Queue<String> queries = new LinkedList<>();
     private String url;
     private String user;
     private String password;
 
-    public DatabaseConnectionWrapper(Connection connection, String url, String user, String password) {
+    public DatabaseConnectionWrapper(Connection connection, String recognizableName, String url, String user, String password) {
         this.connection = connection;
         this.url = url;
         this.user = user;
         this.password = password;
+        this.recognizableName = recognizableName;
         this.isUp = true;
         logger.info("DatabaseConnectionWrapper initialized with connection: " + connection);
     }
@@ -39,6 +41,10 @@ public class DatabaseConnectionWrapper {
 
     public boolean isUp() {
         return isUp;
+    }
+
+    public String getRecognizableName() {
+        return recognizableName;
     }
 
     public boolean tryReconnect() {
