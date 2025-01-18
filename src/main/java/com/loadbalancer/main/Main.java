@@ -8,9 +8,10 @@ import com.loadbalancer.balancer.RoundRobinStrategy;
 import com.loadbalancer.connection.DatabaseConnectionManagerFacade;
 import com.loadbalancer.connection.DatabaseConnectionWrapper;
 import com.loadbalancer.util.Log;
+import com.loadbalancer.proxy.DatabaseProxy;
 
 public class Main {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, InterruptedException {
         DatabaseConnectionManagerFacade databaseFacade = new DatabaseConnectionManagerFacade();
         databaseFacade.addSampleConnections();
         
@@ -20,32 +21,24 @@ public class Main {
         loadBalancer.initialize(roundRobinStrategy, databaseFacade);
         Log.info("LoadBalancer initialized successfully.");
 
+        DatabaseProxy databaseProxy = new DatabaseProxy(loadBalancer);
+
+        // ---------------- Below are operations on databases ----------------
+
         // Clear users table
-        loadBalancer.getDatabaseConnections().forEach(connection -> {
-            connection.executeUpdate("DELETE FROM Users");
-        });
+        databaseProxy.executeUpdate("DELETE FROM Users");
 
         // Test the load balancer for UPDATING
-        loadBalancer.getDatabaseConnections().forEach(connection -> {
-            connection.executeUpdate("INSERT INTO Users (username, password, email) VALUES ('user1', 'pass1', 'user1@example.com')");
-        });
+        databaseProxy.executeUpdate("INSERT INTO Users (username, password, email) VALUES ('user1', 'pass1', 'user1@example.com')");
 
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(10000);
 
         // Test the load balancer for UPDATING
-        loadBalancer.getDatabaseConnections().forEach(connection -> {
-            connection.executeUpdate("INSERT INTO Users (username, password, email) VALUES ('user12', 'pass12', 'user12@example.com')");
-        });
+        databaseProxy.executeUpdate("INSERT INTO Users (username, password, email) VALUES ('user12', 'pass12', 'user12@example.com')");
 
         // Test the load balancer for SELECT
-        // for (int i = 0; i < 10; i++) {
         while (true) {
-            DatabaseConnectionWrapper connection = loadBalancer.getDatabaseConnection();
-            List<String> entries = connection.executeQuery("SELECT * FROM Users");
+            List<String> entries = databaseProxy.executeQuery("SELECT * FROM Users");
             if (entries != null){
                 for (String entry : entries) {
                     System.out.println(entry);
@@ -54,11 +47,7 @@ public class Main {
                 Log.error("Failed to retrieve entries from the database.");
             }
 
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            Thread.sleep(2000);
         }
     }
 }
