@@ -12,6 +12,8 @@ public class RoundRobinStrategy implements LoadBalancingStrategy {
             throw new IllegalArgumentException("No databases available");
         }
 
+        System.out.println("dbIndex" + currentIndex + ": ");
+
         Connection db = databases.get(currentIndex);
         currentIndex = (currentIndex + 1) % databases.size();
         return db;
