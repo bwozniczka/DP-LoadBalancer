@@ -21,16 +21,20 @@ public class Main {
         Log.info("LoadBalancer initialized successfully.");
 
         // Test the load balancer for UPDATING
-        // loadBalancer.getDatabaseConnections().forEach(connection -> {
-        //     connection.executeUpdate("INSERT INTO Users (username, password, email) VALUES ('userek', 'passwordzik', 'userek@example.com')");
-        // });
+        loadBalancer.getDatabaseConnections().forEach(connection -> {
+            connection.executeUpdate("INSERT INTO Users (username, password, email) VALUES ('userek', 'passwordzik', 'userek@example.com')");
+        });
 
         // Test the load balancer for SELECT
         for (int i = 0; i < 10; i++) {
             DatabaseConnectionWrapper connection = loadBalancer.getDatabaseConnection();
             List<String> entries = connection.executeQuery("SELECT * FROM Users");
-            for (String entry : entries) {
-                System.out.println(entry);
+            if (entries != null){
+                for (String entry : entries) {
+                    System.out.println(entry);
+                }
+            } else {
+                Log.error("Failed to retrieve entries from the database.");
             }
         }
     }

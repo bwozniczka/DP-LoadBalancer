@@ -68,7 +68,7 @@ public class DatabaseConnectionWrapper {
         }
 
         try (Statement statement = connection.createStatement()) {
-            Log.info("Query executed: " + query);
+            Log.info("Executing query: " + query);
 
             ResultSet resultSet = statement.executeQuery(query);
             int columnCount = resultSet.getMetaData().getColumnCount();
@@ -84,7 +84,7 @@ public class DatabaseConnectionWrapper {
                 output.add(record);
             }
 
-            Log.info("Query returned results.");
+            Log.info("Query executed successfully");
             return output;
 
         } catch (SQLException e) {

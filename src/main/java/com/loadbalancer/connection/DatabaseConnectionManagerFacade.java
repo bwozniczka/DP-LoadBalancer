@@ -22,14 +22,27 @@ public class DatabaseConnectionManagerFacade {
     public void addSampleConnections() throws SQLException {
         addConnection(DatabaseType.POSTGRESQL, "localhost", 5432, "db1", "user1", "password1");
         addConnection(DatabaseType.POSTGRESQL, "localhost", 5433, "db2", "user2", "password2");
-        addConnection(DatabaseType.MYSQL, "localhost", 3306, "db3", "user3", "password3");
+        addConnection(DatabaseType.POSTGRESQL, "localhost", 5434, "db3", "user3", "password3");
+        addConnection(DatabaseType.MYSQL, "localhost", 3306, "db4", "user4", "password4");
+        addConnection(DatabaseType.MYSQL, "localhost", 3307, "db5", "user5", "password5");
+        addConnection(DatabaseType.MYSQL, "localhost", 3308, "db6", "user6", "password6");
+        addConnection(DatabaseType.ORACLE, "localhost", 1521, "xe", "system", "oracle");
+        addConnection(DatabaseType.ORACLE, "localhost", 1522, "xe", "system", "oracle");
+        addConnection(DatabaseType.SQLSERVER, "localhost", 1433, "db7", "sa", "YourStrong!Passw0rd");
+        addConnection(DatabaseType.SQLSERVER, "localhost", 1434, "db8", "sa", "YourStrong!Passw0rd");
         Log.info("Sample connections added successfully.");
     }
 
     public void addConnection(DatabaseType type, String host, int port, String dbName, String user, String password) throws SQLException {
-        connections.add(DatabaseConnectionFactory.createConnection(type, host, port, dbName, user, password));
+        DatabaseConnectionWrapper connection = DatabaseConnectionFactory.createConnection(type, host, port, dbName, user, password);
 
-        Log.info("Connection to " + dbName + " added successfully.");
+        if (connection != null){
+            connections.add(connection);
+            Log.info("Connection to " + dbName + " added successfully.");
+        } else {
+            Log.error("Failed to add connection to " + dbName);
+        }
+
     }
 
     /*
