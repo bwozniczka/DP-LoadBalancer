@@ -19,18 +19,15 @@ public class RoundRobinStrategy implements LoadBalancingStrategy {
         }
 
         DatabaseConnectionWrapper db;
-        boolean isConnectionValid;
         do {
             db = databases.get(currentIndex);
-            isConnectionValid = db.isConnectionValid();
-
-            if (!isConnectionValid) {
-                db.tryReconnect();
-            }
-
             currentIndex = (currentIndex + 1) % databases.size();
+
+            // if (!db.isUp()) {
+            //     db.tryReconnect();
+            // }
             
-        } while(!isConnectionValid);
+        } while(!db.isUp());
         
         logger.info("Database: " + (currentIndex + 1));
         return db;

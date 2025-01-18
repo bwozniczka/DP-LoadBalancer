@@ -17,6 +17,7 @@ import java.sql.Statement;
 public class DatabaseConnectionWrapper {
     private static Logger logger = LoggerFactory.getLogger(DatabaseConnectionWrapper.class);
     
+    private boolean isUp;
     private Connection connection;
     private Queue<String> queries = new LinkedList<>();
     private String url;
@@ -28,7 +29,16 @@ public class DatabaseConnectionWrapper {
         this.url = url;
         this.user = user;
         this.password = password;
+        this.isUp = true;
         logger.info("DatabaseConnectionWrapper initialized with connection: " + connection);
+    }
+
+    public void setIsUp(boolean isUp) {
+        this.isUp = isUp;
+    }
+
+    public boolean isUp() {
+        return isUp;
     }
 
     public boolean tryReconnect() {
@@ -38,6 +48,7 @@ public class DatabaseConnectionWrapper {
             }
             connection = DriverManager.getConnection(url, user, password);
             logger.info("Reconnected to the database successfully.");
+            isUp = true;
             executeQueuedQueries();
 
             return true;
@@ -64,6 +75,7 @@ public class DatabaseConnectionWrapper {
             return connection.isValid(0);
         } catch (SQLException e) {
             logger.error("Error checking connection validity: " + e.getMessage());
+            isUp = false;
             return false;
         }
     }

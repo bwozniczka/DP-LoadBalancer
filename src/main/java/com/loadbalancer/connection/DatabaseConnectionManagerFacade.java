@@ -3,6 +3,9 @@ package com.loadbalancer.connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +19,25 @@ public class DatabaseConnectionManagerFacade {
     private static Logger logger = LoggerFactory.getLogger(DatabaseConnectionManagerFacade.class);
     
     private List<DatabaseConnectionWrapper> connections;
+    private ScheduledExecutorService scheduler;
 
     public DatabaseConnectionManagerFacade() {
         connections = new ArrayList<>();
+
+        scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(this::checkConnections, 10L, 10L, TimeUnit.SECONDS);
+    }
+
+    private void checkConnections() {
+        for (DatabaseConnectionWrapper connection : connections) {
+            boolean isValid = connection.isConnectionValid();
+            connection.setIsUp(isValid);
+            logger.info("Connection " + connection + " is " + (isValid ? "up" : "down"));
+
+            if (!isValid) {
+                connection.tryReconnect();
+            }
+        }
     }
 
     // mock function
