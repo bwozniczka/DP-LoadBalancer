@@ -4,7 +4,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.loadbalancer.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //****************************
 // Design Pattern: Facade
@@ -12,6 +13,8 @@ import com.loadbalancer.util.Log;
 //****************************
 
 public class DatabaseConnectionManagerFacade {
+    private static Logger logger = LoggerFactory.getLogger(DatabaseConnectionManagerFacade.class);
+    
     private List<DatabaseConnectionWrapper> connections;
 
     public DatabaseConnectionManagerFacade() {
@@ -30,7 +33,7 @@ public class DatabaseConnectionManagerFacade {
         addConnection(DatabaseType.MYSQL, "localhost", 3308, "db8", "user8", "password8");
         addConnection(DatabaseType.MYSQL, "localhost", 3309, "db9", "user9", "password9");
         addConnection(DatabaseType.MYSQL, "localhost", 3310, "db10", "user10", "password10");
-        Log.info("Sample connections added successfully.");
+        logger.info("Sample connections added successfully.");
     }
 
     public void addConnection(DatabaseType type, String host, int port, String dbName, String user, String password) throws SQLException {
@@ -38,9 +41,9 @@ public class DatabaseConnectionManagerFacade {
 
         if (connection != null){
             connections.add(connection);
-            Log.info("Connection to " + dbName + " added successfully.");
+            logger.info("Connection to " + dbName + " added successfully.");
         } else {
-            Log.error("Failed to add connection to " + dbName);
+            logger.error("Failed to add connection to " + dbName);
         }
 
     }
@@ -53,28 +56,28 @@ public class DatabaseConnectionManagerFacade {
         boolean removed = false;
 
         if (connection != null) {
-            Log.info("Disconnecting and removing connection: " + connection);
+            logger.info("Disconnecting and removing connection: " + connection);
             connection.disconnect();
             removed = connections.remove(connection);
             if (removed) {
-                Log.info("Connection " + connection + " successfully removed.");
+                logger.info("Connection " + connection + " successfully removed.");
             } else {
-                Log.warn("Connection " + connection + " was not found in the list.");
+                logger.warn("Connection " + connection + " was not found in the list.");
             }
         }
         return removed;
     }
 
     public void disposeConnectionAll() {
-        Log.info("Disposing all database connections...");
+        logger.info("Disposing all database connections...");
         for (DatabaseConnectionWrapper connection : connections) {
             if (connection != null) {
-                Log.info("Disconnecting and removing connection: " + connection);
+                logger.info("Disconnecting and removing connection: " + connection);
                 connection.disconnect();
                 connections.remove(connection);
             }
         }
-        Log.info("All connections disposed.");
+        logger.info("All connections disposed.");
     }
 
     public List<DatabaseConnectionWrapper> getConnections() {

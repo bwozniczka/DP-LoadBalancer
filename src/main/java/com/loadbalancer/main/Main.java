@@ -3,14 +3,17 @@ package com.loadbalancer.main;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.loadbalancer.balancer.LoadBalancer;
 import com.loadbalancer.balancer.RoundRobinStrategy;
 import com.loadbalancer.connection.DatabaseConnectionManagerFacade;
-import com.loadbalancer.connection.DatabaseConnectionWrapper;
-import com.loadbalancer.util.Log;
 import com.loadbalancer.proxy.DatabaseProxy;
 
 public class Main {
+    private static Logger logger = LoggerFactory.getLogger(DatabaseConnectionManagerFacade.class);
+
     public static void main(String[] args) throws SQLException, InterruptedException {
         DatabaseConnectionManagerFacade databaseFacade = new DatabaseConnectionManagerFacade();
         databaseFacade.addSampleConnections();
@@ -19,7 +22,7 @@ public class Main {
 
         LoadBalancer loadBalancer = LoadBalancer.getInstance();
         loadBalancer.initialize(roundRobinStrategy, databaseFacade);
-        Log.info("LoadBalancer initialized successfully.");
+        logger.info("LoadBalancer initialized successfully.");
 
         DatabaseProxy databaseProxy = new DatabaseProxy(loadBalancer);
 
@@ -43,8 +46,9 @@ public class Main {
                 for (String entry : entries) {
                     System.out.println(entry);
                 }
+                System.out.println();
             } else {
-                Log.error("Failed to retrieve entries from the database.");
+                logger.error("Failed to retrieve entries from the database.");
             }
 
             Thread.sleep(2000);

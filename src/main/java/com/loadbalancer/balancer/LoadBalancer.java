@@ -2,15 +2,19 @@ package com.loadbalancer.balancer;
 
 import java.util.List;
 
+
 import com.loadbalancer.connection.DatabaseConnectionManagerFacade;
 import com.loadbalancer.connection.DatabaseConnectionWrapper;
-import com.loadbalancer.util.Log;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //****************************
 // Design Pattern: Singleton (Bill Pugh implementation)
 //****************************
 
 public class LoadBalancer {
+    private static Logger logger = LoggerFactory.getLogger(LoadBalancer.class);
     private DatabaseConnectionManagerFacade databaseManager;
     private LoadBalancingStrategy strategy;
 
@@ -32,14 +36,14 @@ public class LoadBalancer {
     // Method to synchronize queries across all databases
     public List<DatabaseConnectionWrapper> getDatabaseConnections() {
         List<DatabaseConnectionWrapper> connections = databaseManager.getConnections();
-        Log.info("Number of connections retrieved: " + connections.size());
+        logger.info("Number of connections retrieved: " + connections.size());
         return connections;
     }
 
     // Method to get a database for SELECT operations based on the strategy
     public DatabaseConnectionWrapper getDatabaseConnection() {
         DatabaseConnectionWrapper connection = strategy.chooseDatabase(databaseManager.getConnections());
-        Log.info("Chosen database connection: " + connection);
+        logger.info("Chosen database connection: " + connection);
         return connection;
     }
 }

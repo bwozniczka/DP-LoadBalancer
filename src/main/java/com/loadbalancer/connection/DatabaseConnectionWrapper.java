@@ -8,10 +8,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Statement;
-import com.loadbalancer.util.Log;
 
 public class DatabaseConnectionWrapper {
+    private static Logger logger = LoggerFactory.getLogger(DatabaseConnectionWrapper.class);
     private Connection connection;
     private Queue<String> queries = new LinkedList<>();
     private String url;
@@ -23,7 +27,7 @@ public class DatabaseConnectionWrapper {
         this.url = url;
         this.user = user;
         this.password = password;
-        Log.info("DatabaseConnectionWrapper initialized with connection: " + connection);
+        logger.info("DatabaseConnectionWrapper initialized with connection: " + connection);
     }
 
     public boolean tryReconnect() {
@@ -32,11 +36,12 @@ public class DatabaseConnectionWrapper {
                 connection.close();
             }
             connection = DriverManager.getConnection(url, user, password);
-            Log.info("Reconnected to the database successfully.");
+            logger.info("Reconnected to the database successfully.");
+            executeQueuedQueries();
 
             return true;
         } catch (SQLException e) {
-            Log.error("Can't reconnect (database probably still down): " + e.getMessage());
+            logger.error("Can't reconnect (database probably still down): " + e.getMessage());
             return false;
         }
     }
@@ -46,10 +51,10 @@ public class DatabaseConnectionWrapper {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
-                Log.info("Connection closed successfully.");
+                logger.info("Connection closed successfully.");
             }
         } catch (SQLException e) {
-            Log.error("Error while closing connection: " + e.getMessage());
+            logger.error("Error while closing connection: " + e.getMessage());
         }
     }
 
@@ -57,7 +62,7 @@ public class DatabaseConnectionWrapper {
         try {
             return connection.isValid(0);
         } catch (SQLException e) {
-            Log.error("Error checking connection validity: " + e.getMessage());
+            logger.error("Error checking connection validity: " + e.getMessage());
             return false;
         }
     }
@@ -67,32 +72,12 @@ public class DatabaseConnectionWrapper {
     */
     public boolean executeUpdate(String query) {
 
-        // check whether connectio is valid
-        try {
-            if (!connection.isValid(0)){
-                Log.error("Connection is not valid, query will be queued: " + query);
-                queries.add(query);
-                return false;
-            }
-        } catch (SQLException e) {
-            Log.error("Error checking connection validity: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        // execute queued queries
-        executeQueuedQueries();
-        if (!queries.isEmpty()){
-            queries.add(query);
-            Log.warn("Couldn't execute queries in queue, therefore current query is also appended: " + query);
-            return false;
-        }
-
         // execute actual query
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(query);
-            Log.info("Query executed successfully: " + query);
+            logger.info("Query executed successfully: " + query);
         } catch (SQLException e) {
-            Log.error("Query failed: " + query + ". Error: " + e.getMessage());
+            logger.error("Query failed: " + query + ". Error: " + e.getMessage());
         }
 
         return true;
@@ -103,30 +88,10 @@ public class DatabaseConnectionWrapper {
      * If the query fails, it returns null.
      */
     public List<String> executeQuery(String query) {
-        Log.info("Executing query: " + query);
-
-        // check whether connectio is valid
-        try {
-            if (!connection.isValid(0)){
-                Log.error("Connection is not valid");
-                return null;
-            }
-        } catch (SQLException e) {
-            Log.error("Error checking connection validity: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        // execute queued queries
-        executeQueuedQueries();
-        if (!queries.isEmpty()){
-            Log.warn("Couldn't execute queries in queue: " + query);
-            return null;
-        }
+        logger.info("Executing query: " + query);
 
         // execute actual query
         try (Statement statement = connection.createStatement()) {
-            Log.info("Executing query: " + query);
-
             ResultSet resultSet = statement.executeQuery(query);
             int columnCount = resultSet.getMetaData().getColumnCount();
             List<String> output = new ArrayList<String>();
@@ -136,16 +101,15 @@ public class DatabaseConnectionWrapper {
                 for (int j = 1; j <= columnCount; j++) {
                     record += (resultSet.getString(j) + "\t");
                 }
-                record += '\n';
 
                 output.add(record);
             }
 
-            Log.info("Query executed successfully");
+            logger.info("Query executed successfully");
             return output;
 
         } catch (SQLException e) {
-            Log.error("Query failed: " + query + ". Error: " + e.getMessage());
+            logger.error("Query failed: " + query + ". Error: " + e.getMessage());
             return null;
         }
     }
@@ -155,9 +119,9 @@ public class DatabaseConnectionWrapper {
             String query = queries.poll();
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate(query);
-                Log.info("Queued query executed: " + query);
+                logger.info("Queued query executed: " + query);
             } catch (SQLException e) {
-                Log.error("Error executing queued query: " + query + ". Error: " + e.getMessage());
+                logger.error("Error executing queued query: " + query + ". Error: " + e.getMessage());
             }
         }
     }

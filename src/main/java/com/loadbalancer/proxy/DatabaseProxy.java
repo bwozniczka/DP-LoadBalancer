@@ -2,15 +2,18 @@ package com.loadbalancer.proxy;
 
 import com.loadbalancer.balancer.LoadBalancer;
 import com.loadbalancer.connection.DatabaseConnectionWrapper;
-import com.loadbalancer.util.Log;
 
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //****************************
 // Design Pattern: Proxy
 //****************************
 
 public class DatabaseProxy {
+    private static Logger logger = LoggerFactory.getLogger(DatabaseProxy.class);
     private LoadBalancer loadBalancer;
 
     public DatabaseProxy(LoadBalancer loadBalancer) {
@@ -18,7 +21,7 @@ public class DatabaseProxy {
     }
 
     public boolean executeUpdate(String query) {
-        Log.info("Executing update query through proxy: " + query);
+        logger.info("Executing update query through proxy: " + query);
         boolean success = true;
         for (DatabaseConnectionWrapper connection : loadBalancer.getDatabaseConnections()) {
             if (!connection.executeUpdate(query)) {
@@ -29,7 +32,7 @@ public class DatabaseProxy {
     }
 
     public List<String> executeQuery(String query) {
-        Log.info("Executing select query through proxy: " + query);
+        logger.info("Executing select query through proxy: " + query);
         DatabaseConnectionWrapper connection = loadBalancer.getDatabaseConnection();
         return connection.executeQuery(query);
     }

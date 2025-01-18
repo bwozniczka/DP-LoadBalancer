@@ -1,13 +1,16 @@
 package com.loadbalancer.connection;
 
-import com.loadbalancer.util.Log;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // TODO: Fix Error that occure when there is nothing on that specific port 
 public class DatabaseConnectionFactory {
+    private static Logger logger = LoggerFactory.getLogger(DatabaseConnectionFactory.class);
+
     public static DatabaseConnectionWrapper createConnection(DatabaseType type, String host, int port, String dbName, String user, String password) {
         String url;
         Connection conn = null;
@@ -34,7 +37,7 @@ public class DatabaseConnectionFactory {
             }
             return new DatabaseConnectionWrapper(conn, url, user, password);
         } catch (SQLException e) {
-            Log.error("Failed to connect to database: " + e.getMessage());
+            logger.error("Failed to connect to database: " + e.getMessage());
             return null;
         }
     }

@@ -2,9 +2,13 @@ package com.loadbalancer.balancer;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.loadbalancer.connection.DatabaseConnectionWrapper;
 
 public class RoundRobinStrategy implements LoadBalancingStrategy {
+    private static Logger logger = LoggerFactory.getLogger(RoundRobinStrategy.class);
     private int currentIndex = 0;
 
     @Override
@@ -13,7 +17,6 @@ public class RoundRobinStrategy implements LoadBalancingStrategy {
             throw new IllegalArgumentException("No databases available");
         }
 
-        
         DatabaseConnectionWrapper db;
         boolean isConnectionValid;
         do {
@@ -24,11 +27,11 @@ public class RoundRobinStrategy implements LoadBalancingStrategy {
                 db.tryReconnect();
             }
 
-            System.out.println("Database: " + (currentIndex + 1));
             currentIndex = (currentIndex + 1) % databases.size();
-
+            
         } while(!isConnectionValid);
         
+        logger.info("Database: " + (currentIndex + 1));
         return db;
     }
     

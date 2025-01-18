@@ -2,9 +2,11 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n</pattern>
         </encoder>
     </appender>
+
+    <!-- <logger name="com.mysql.cj.protocol.FullReadInputStream" level="OFF" /> -->
 
     <root level="debug">
         <appender-ref ref="STDOUT" />
