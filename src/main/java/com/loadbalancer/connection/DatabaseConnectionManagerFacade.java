@@ -23,13 +23,13 @@ public class DatabaseConnectionManagerFacade {
         addConnection(DatabaseType.POSTGRESQL, "localhost", 5432, "db1", "user1", "password1");
         addConnection(DatabaseType.POSTGRESQL, "localhost", 5433, "db2", "user2", "password2");
         addConnection(DatabaseType.POSTGRESQL, "localhost", 5434, "db3", "user3", "password3");
-        addConnection(DatabaseType.MYSQL, "localhost", 3306, "db4", "user4", "password4");
-        addConnection(DatabaseType.MYSQL, "localhost", 3307, "db5", "user5", "password5");
-        addConnection(DatabaseType.MYSQL, "localhost", 3308, "db6", "user6", "password6");
-        addConnection(DatabaseType.ORACLE, "localhost", 1521, "xe", "system", "oracle");
-        addConnection(DatabaseType.ORACLE, "localhost", 1522, "xe", "system", "oracle");
-        addConnection(DatabaseType.SQLSERVER, "localhost", 1433, "db7", "sa", "YourStrong!Passw0rd");
-        addConnection(DatabaseType.SQLSERVER, "localhost", 1434, "db8", "sa", "YourStrong!Passw0rd");
+        addConnection(DatabaseType.POSTGRESQL, "localhost", 5435, "db4", "user4", "password4");
+        addConnection(DatabaseType.POSTGRESQL, "localhost", 5436, "db5", "user5", "password5");
+        addConnection(DatabaseType.MYSQL, "localhost", 3306, "db6", "user6", "password6");
+        addConnection(DatabaseType.MYSQL, "localhost", 3307, "db7", "user7", "password7");
+        addConnection(DatabaseType.MYSQL, "localhost", 3308, "db8", "user8", "password8");
+        addConnection(DatabaseType.MYSQL, "localhost", 3309, "db9", "user9", "password9");
+        addConnection(DatabaseType.MYSQL, "localhost", 3310, "db10", "user10", "password10");
         Log.info("Sample connections added successfully.");
     }
 

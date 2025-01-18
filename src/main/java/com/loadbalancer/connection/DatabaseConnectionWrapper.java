@@ -1,6 +1,7 @@
 package com.loadbalancer.connection;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,11 +13,32 @@ import com.loadbalancer.util.Log;
 
 public class DatabaseConnectionWrapper {
     private Connection connection;
-    private Queue<String> queries = new LinkedList<String>();
+    private Queue<String> queries = new LinkedList<>();
+    private String url;
+    private String user;
+    private String password;
 
-    public DatabaseConnectionWrapper(Connection connection) {
+    public DatabaseConnectionWrapper(Connection connection, String url, String user, String password) {
         this.connection = connection;
+        this.url = url;
+        this.user = user;
+        this.password = password;
         Log.info("DatabaseConnectionWrapper initialized with connection: " + connection);
+    }
+
+    public boolean tryReconnect() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+            connection = DriverManager.getConnection(url, user, password);
+            Log.info("Reconnected to the database successfully.");
+
+            return true;
+        } catch (SQLException e) {
+            Log.error("Can't reconnect (database probably still down): " + e.getMessage());
+            return false;
+        }
     }
 
     // Disconnects the connection
@@ -31,27 +53,49 @@ public class DatabaseConnectionWrapper {
         }
     }
 
+    public boolean isConnectionValid(){
+        try {
+            return connection.isValid(0);
+        } catch (SQLException e) {
+            Log.error("Error checking connection validity: " + e.getMessage());
+            return false;
+        }
+    }
+
     /*
-    * Executes a query that alters the database (e.g., INSERT, UPDATE, DELETE).
-    * If the query fails, it is added to the queries queue.
+    * Returns false when the connection is not valid. Connection is queued.
     */
     public boolean executeUpdate(String query) {
+
+        // check whether connectio is valid
+        try {
+            if (!connection.isValid(0)){
+                Log.error("Connection is not valid, query will be queued: " + query);
+                queries.add(query);
+                return false;
+            }
+        } catch (SQLException e) {
+            Log.error("Error checking connection validity: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        // execute queued queries
         executeQueuedQueries();
         if (!queries.isEmpty()){
             queries.add(query);
-            Log.warn("Query failed and added to queue: " + query);
+            Log.warn("Couldn't execute queries in queue, therefore current query is also appended: " + query);
             return false;
         }
 
+        // execute actual query
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(query);
             Log.info("Query executed successfully: " + query);
-            return true;
         } catch (SQLException e) {
-            queries.add(query);
-            Log.error("Query failed, added to queue: " + query + ". Error: " + e.getMessage());
-            return false;
+            Log.error("Query failed: " + query + ". Error: " + e.getMessage());
         }
+
+        return true;
     }
 
     /*
@@ -61,12 +105,25 @@ public class DatabaseConnectionWrapper {
     public List<String> executeQuery(String query) {
         Log.info("Executing query: " + query);
 
+        // check whether connectio is valid
+        try {
+            if (!connection.isValid(0)){
+                Log.error("Connection is not valid");
+                return null;
+            }
+        } catch (SQLException e) {
+            Log.error("Error checking connection validity: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        // execute queued queries
         executeQueuedQueries();
         if (!queries.isEmpty()){
-            Log.warn("Query added to queue due to failure: " + query);
+            Log.warn("Couldn't execute queries in queue: " + query);
             return null;
         }
 
+        // execute actual query
         try (Statement statement = connection.createStatement()) {
             Log.info("Executing query: " + query);
 

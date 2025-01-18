@@ -32,7 +32,7 @@ public class DatabaseConnectionFactory {
                 default:
                     throw new IllegalArgumentException("Unknown database type");
             }
-            return new DatabaseConnectionWrapper(conn);
+            return new DatabaseConnectionWrapper(conn, url, user, password);
         } catch (SQLException e) {
             Log.error("Failed to connect to database: " + e.getMessage());
             return null;

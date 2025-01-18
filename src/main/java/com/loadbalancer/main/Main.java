@@ -20,13 +20,30 @@ public class Main {
         loadBalancer.initialize(roundRobinStrategy, databaseFacade);
         Log.info("LoadBalancer initialized successfully.");
 
+        // Clear users table
+        loadBalancer.getDatabaseConnections().forEach(connection -> {
+            connection.executeUpdate("DELETE FROM Users");
+        });
+
         // Test the load balancer for UPDATING
         loadBalancer.getDatabaseConnections().forEach(connection -> {
-            connection.executeUpdate("INSERT INTO Users (username, password, email) VALUES ('userek', 'passwordzik', 'userek@example.com')");
+            connection.executeUpdate("INSERT INTO Users (username, password, email) VALUES ('user1', 'pass1', 'user1@example.com')");
+        });
+
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Test the load balancer for UPDATING
+        loadBalancer.getDatabaseConnections().forEach(connection -> {
+            connection.executeUpdate("INSERT INTO Users (username, password, email) VALUES ('user12', 'pass12', 'user12@example.com')");
         });
 
         // Test the load balancer for SELECT
-        for (int i = 0; i < 10; i++) {
+        // for (int i = 0; i < 10; i++) {
+        while (true) {
             DatabaseConnectionWrapper connection = loadBalancer.getDatabaseConnection();
             List<String> entries = connection.executeQuery("SELECT * FROM Users");
             if (entries != null){
@@ -35,6 +52,12 @@ public class Main {
                 }
             } else {
                 Log.error("Failed to retrieve entries from the database.");
+            }
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }

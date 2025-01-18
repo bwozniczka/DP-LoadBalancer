@@ -36,14 +36,38 @@ services:
     volumes:
       - ./data/db-init/init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql
 
+  postgres4:
+    image: postgres:15
+    container_name: postgres4
+    environment:
+      POSTGRES_USER: user4
+      POSTGRES_PASSWORD: password4
+      POSTGRES_DB: db4
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./data/db-init/init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql
+
+  postgres5:
+    image: postgres:15
+    container_name: postgres5
+    environment:
+      POSTGRES_USER: user5
+      POSTGRES_PASSWORD: password5
+      POSTGRES_DB: db5
+    ports:
+      - "5436:5432"
+    volumes:
+      - ./data/db-init/init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql
+
   mysql1:
     image: mysql:8
     container_name: mysql1
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: user4
-      MYSQL_PASSWORD: password4
-      MYSQL_DATABASE: db4
+      MYSQL_USER: user6
+      MYSQL_PASSWORD: password6
+      MYSQL_DATABASE: db6
     ports:
       - "3306:3306"
     volumes:
@@ -54,9 +78,9 @@ services:
     container_name: mysql2
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: user5
-      MYSQL_PASSWORD: password5
-      MYSQL_DATABASE: db5
+      MYSQL_USER: user7
+      MYSQL_PASSWORD: password7
+      MYSQL_DATABASE: db7
     ports:
       - "3307:3306"
     volumes:
@@ -67,54 +91,81 @@ services:
     container_name: mysql3
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: user6
-      MYSQL_PASSWORD: password6
-      MYSQL_DATABASE: db6
+      MYSQL_USER: user8
+      MYSQL_PASSWORD: password8
+      MYSQL_DATABASE: db8
     ports:
       - "3308:3306"
     volumes:
       - ./data/db-init/init-mysql.sql:/docker-entrypoint-initdb.d/init-mysql.sql
 
-  sqlserver1:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    container_name: sqlserver1
+  mysql4:
+    image: mysql:8
+    container_name: mysql4
     environment:
-      SA_PASSWORD: "YourStrong!Passw0rd"
-      ACCEPT_EULA: "Y"
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user9
+      MYSQL_PASSWORD: password9
+      MYSQL_DATABASE: db9
     ports:
-      - "1433:1433"
+      - "3309:3306"
     volumes:
-      - ./data/db-init/init-sqlserver.sql:/docker-entrypoint-initdb.d/init-sqlserver.sql
+      - ./data/db-init/init-mysql.sql:/docker-entrypoint-initdb.d/init-mysql.sql
 
-  sqlserver2:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    container_name: sqlserver2
+  mysql5:
+    image: mysql:8
+    container_name: mysql5
     environment:
-      SA_PASSWORD: "YourStrong!Passw0rd"
-      ACCEPT_EULA: "Y"
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user10
+      MYSQL_PASSWORD: password10
+      MYSQL_DATABASE: db10
     ports:
-      - "1434:1433"
+      - "3310:3306"
     volumes:
-      - ./data/db-init/init-sqlserver.sql:/docker-entrypoint-initdb.d/init-sqlserver.sql
+      - ./data/db-init/init-mysql.sql:/docker-entrypoint-initdb.d/init-mysql.sql
 
-  oracle1:
-    image: oracleinanutshell/oracle-xe-11g
-    container_name: oracle1
-    environment:
-      ORACLE_ALLOW_REMOTE: "true"
-      ORACLE_PASSWORD: "oracle"
-    ports:
-      - "1521:1521"
-    volumes:
-      - ./data/db-init/init-oracle.sql:/docker-entrypoint-initdb.d/init-oracle.sql
+  # sqlserver1:
+  #   image: mcr.microsoft.com/mssql/server:2019-latest
+  #   container_name: sqlserver1
+  #   environment:
+  #     SA_PASSWORD: "YourStrongPassw0rd"
+  #     ACCEPT_EULA: "Y"
+  #   ports:
+  #     - "1433:1433"
+  #   volumes:
+  #     - ./data/db-init/init-sqlserver.sql:/docker-entrypoint-initdb.d/init-sqlserver.sql
 
-  oracle2:
-    image: oracleinanutshell/oracle-xe-11g
-    container_name: oracle2
-    environment:
-      ORACLE_ALLOW_REMOTE: "true"
-      ORACLE_PASSWORD: "oracle"
-    ports:
-      - "1522:1521"
-    volumes:
-      - ./data/db-init/init-oracle.sql:/docker-entrypoint-initdb.d/init-oracle.sql
+  # sqlserver2:
+  #   image: mcr.microsoft.com/mssql/server:2019-latest
+  #   container_name: sqlserver2
+  #   environment:
+  #     SA_PASSWORD: "YourStrongPassw0rd"
+  #     ACCEPT_EULA: "Y"
+  #   ports:
+  #     - "1434:1433"
+  #   volumes:
+  #     - ./data/db-init/init-sqlserver.sql:/docker-entrypoint-initdb.d/init-sqlserver.sql
+
+  # oracle1:
+  #   image: gvenzl/oracle-xe
+  #   container_name: oracle1
+  #   environment:
+  #     ORACLE_ALLOW_REMOTE: "true"
+  #     ORACLE_PASSWORD: "oracle"
+  #   ports:
+  #     - "1521:1521"
+  #   volumes:
+  #     - ./data/db-init/init-oracle.sql:/container-entrypoint-initdb.d/init-oracle.sql
+
+  # oracle2:
+  #   image: gvenzl/oracle-xe
+  #   container_name: oracle2
+  #   environment:
+  #     ORACLE_RANDOM_PASSWORD: true
+  #     APP_USER: my_user_oracle
+  #     APP_USER_PASSWORD: my_password_oracle
+  #   ports:
+  #     - "1522:1521"
+  #   volumes:
+  #     - ./data/db-init/init-oracle.sql:/container-entrypoint-initdb.d/init-oracle.sql
