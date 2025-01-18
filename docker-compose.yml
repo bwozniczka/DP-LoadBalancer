@@ -10,7 +10,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./data/db-init/init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql
+      - ./data/db-init/init-postgres1.sql:/docker-entrypoint-initdb.d/init-postgres.sql
 
   postgres2:
     image: postgres:15
@@ -22,7 +22,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ./data/db-init/init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql
+      - ./data/db-init/init-postgres2.sql:/docker-entrypoint-initdb.d/init-postgres.sql
 
   mysql:
     image: mysql:8
