@@ -107,6 +107,14 @@ public class DatabaseConnectionWrapper {
             statement.executeUpdate(query);
             logger.info("Database: " + recognizableName + ": Query executed successfully: " + query);
         } catch (SQLException e) {
+            // prevent the situation when db get "down", but background thread haven't reach 5s interval to mark it.
+            if (isConnectionValid()){
+                queries.add(query);
+            } else {
+                isUp = false;
+                queries.add(query);
+            }
+
             logger.error("Query failed: " + query + ". Error: " + e.getMessage());
             return false;
         }
