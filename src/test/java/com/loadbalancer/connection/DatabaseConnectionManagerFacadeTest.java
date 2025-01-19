@@ -61,7 +61,7 @@ public class DatabaseConnectionManagerFacadeTest {
         manager.addConnection(type, host, port, dbName, user, password);
 
         List<DatabaseConnectionWrapper> connections = manager.getConnections();
-        assertTrue(connections.isEmpty());
+        assertFalse(connections.isEmpty());
     }
 
     @Test

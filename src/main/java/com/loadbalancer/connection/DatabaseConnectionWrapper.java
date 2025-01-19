@@ -168,4 +168,16 @@ public class DatabaseConnectionWrapper {
     public Connection getConnection() {
         return connection;
     }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getUsername() {
+        return user;
+    }
+
+    public String getPassword(){
+        return password;
+    }
 }
