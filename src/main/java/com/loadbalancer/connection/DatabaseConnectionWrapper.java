@@ -10,12 +10,13 @@ import java.util.List;
 import java.util.Queue;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.loadbalancer.logger.LoggerPanelFactory;
 
 import java.sql.Statement;
 
 public class DatabaseConnectionWrapper {
-    private static Logger logger = LoggerFactory.getLogger(DatabaseConnectionWrapper.class);
+    private static final Logger logger = LoggerPanelFactory.getLogger(DatabaseConnectionWrapper.class);
     
     private boolean isUp;
     private String recognizableName;
@@ -53,7 +54,7 @@ public class DatabaseConnectionWrapper {
                 connection.close();
             }
             connection = DriverManager.getConnection(url, user, password);
-            logger.info("Reconnected to the database successfully.");
+            logger.info("Reconnected to the " + recognizableName + " successfully.");
             isUp = true;
             executeQueuedQueries();
 
@@ -94,9 +95,10 @@ public class DatabaseConnectionWrapper {
         // execute actual query
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(query);
-            logger.info("Query executed successfully: " + query);
+            logger.info("Database: " + recognizableName + ": Query executed successfully: " + query);
         } catch (SQLException e) {
             logger.error("Query failed: " + query + ". Error: " + e.getMessage());
+            return false;
         }
 
         return true;
@@ -107,7 +109,7 @@ public class DatabaseConnectionWrapper {
      * If the query fails, it returns null.
      */
     public List<String> executeQuery(String query) {
-        logger.info("Executing query: " + query);
+        logger.info("Executing query: " + query + " on database " + recognizableName);
 
         // execute actual query
         try (Statement statement = connection.createStatement()) {
@@ -143,5 +145,9 @@ public class DatabaseConnectionWrapper {
                 logger.error("Error executing queued query: " + query + ". Error: " + e.getMessage());
             }
         }
+    }
+
+    public String getDatabaseName() {
+        return recognizableName;
     }
 }

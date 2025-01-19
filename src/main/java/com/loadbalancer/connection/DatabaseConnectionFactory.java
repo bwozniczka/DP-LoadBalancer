@@ -5,11 +5,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-// TODO: Fix Error that occure when there is nothing on that specific port 
+import com.loadbalancer.logger.LoggerPanelFactory;
+
 public class DatabaseConnectionFactory {
-    private static Logger logger = LoggerFactory.getLogger(DatabaseConnectionFactory.class);
+    private static final Logger logger = LoggerPanelFactory.getLogger(DatabaseConnectionFactory.class);
 
     public static DatabaseConnectionWrapper createConnection(DatabaseType type, String host, int port, String dbName, String user, String password) {
         String url;

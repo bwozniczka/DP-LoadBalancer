@@ -10,7 +10,9 @@ import java.util.List;
 import com.loadbalancer.balancer.LoadBalancer;
 import com.loadbalancer.balancer.RoundRobinStrategy;
 import com.loadbalancer.connection.DatabaseConnectionManagerFacade;
+import com.loadbalancer.logger.LoggerPanelFactory;
 import com.loadbalancer.proxy.DatabaseProxy;
+import com.loadbalancer.logger.LoggerPanel;
 
 public class MainFrame extends JFrame {
     private JTextArea statusArea;
@@ -24,20 +26,26 @@ public class MainFrame extends JFrame {
         this.databaseProxy = databaseProxy;
 
         setTitle("Database Load Balancer");
-        setSize(800, 600);
+        setSize(1200, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        statusArea = new JTextArea(10, 50);
+        statusArea = new JTextArea(12, 50);
         statusArea.setEditable(false);
         add(new JScrollPane(statusArea), BorderLayout.NORTH);
 
         queryArea = new JTextArea(5, 50);
         add(new JScrollPane(queryArea), BorderLayout.CENTER);
 
+        JPanel southPanel = new JPanel();
+        southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.Y_AXIS));
+
         resultArea = new JTextArea(10, 50);
         resultArea.setEditable(false);
-        add(new JScrollPane(resultArea), BorderLayout.SOUTH);
+        southPanel.add(new JScrollPane(resultArea));
+        southPanel.add(new JScrollPane(LoggerPanelFactory.getLoggerPanel()));
+
+        add(southPanel, BorderLayout.SOUTH);
 
         JButton executeButton = new JButton("Execute Query");
         executeButton.addActionListener(new ActionListener() {

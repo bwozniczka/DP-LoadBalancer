@@ -8,7 +8,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.loadbalancer.logger.LoggerPanelFactory;
 
 //****************************
 // Design Pattern: Facade
@@ -16,7 +17,7 @@ import org.slf4j.LoggerFactory;
 //****************************
 
 public class DatabaseConnectionManagerFacade {
-    private static Logger logger = LoggerFactory.getLogger(DatabaseConnectionManagerFacade.class);
+    private static Logger logger = LoggerPanelFactory.getLogger(DatabaseConnectionFactory.class);
     
     private List<DatabaseConnectionWrapper> connections;
     private ScheduledExecutorService scheduler;
@@ -75,13 +76,13 @@ public class DatabaseConnectionManagerFacade {
         boolean removed = false;
 
         if (connection != null) {
-            logger.info("Disconnecting and removing connection: " + connection);
+            logger.warn("Disconnecting and removing connection: " + connection);
             connection.disconnect();
             removed = connections.remove(connection);
             if (removed) {
                 logger.info("Connection " + connection + " successfully removed.");
             } else {
-                logger.warn("Connection " + connection + " was not found in the list.");
+                logger.error("Connection " + connection + " was not found in the list.");
             }
         }
         return removed;

@@ -7,15 +7,15 @@ import java.util.Scanner;
 import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.loadbalancer.balancer.LoadBalancer;
 import com.loadbalancer.balancer.RoundRobinStrategy;
 import com.loadbalancer.connection.DatabaseConnectionManagerFacade;
+import com.loadbalancer.logger.LoggerPanelFactory;
 import com.loadbalancer.proxy.DatabaseProxy;
 
 public class Main {
-    private static Logger logger = LoggerFactory.getLogger(DatabaseConnectionManagerFacade.class);
+    private static Logger logger = LoggerPanelFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws SQLException, InterruptedException {
         DatabaseConnectionManagerFacade databaseFacade = new DatabaseConnectionManagerFacade();

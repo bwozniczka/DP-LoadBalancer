@@ -7,14 +7,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.loadbalancer.logger.LoggerPanelFactory;
 
 //****************************
 // Design Pattern: Proxy
 //****************************
 
 public class DatabaseProxy {
-    private static Logger logger = LoggerFactory.getLogger(DatabaseProxy.class);
+    private static final Logger logger = LoggerPanelFactory.getLogger(DatabaseProxy.class);
     
     private LoadBalancer loadBalancer;
 
@@ -26,19 +26,20 @@ public class DatabaseProxy {
         if (query.toLowerCase().contains("select")) {
             return executeQuery(query);
         } else {
-            return executeUpdate(query) ? Arrays.asList("Success") : Arrays.asList("Failed");
+            return executeUpdate(query) ? List.of("Success") : List.of("Failed");
         }
     }
 
     private boolean executeUpdate(String query) {
         logger.info("Executing update query through proxy: " + query);
-        boolean success = true;
+        boolean allSucceeded = true;
+
         for (DatabaseConnectionWrapper connection : loadBalancer.getDatabaseConnections()) {
             if (!connection.executeUpdate(query)) {
-                success = false;
+                allSucceeded = false;
             }
         }
-        return success;
+        return allSucceeded;
     }
 
     private List<String> executeQuery(String query) {
