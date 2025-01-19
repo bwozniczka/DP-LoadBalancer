@@ -32,14 +32,14 @@ public class DatabaseProxy {
 
     private boolean executeUpdate(String query) {
         logger.info("Executing update query through proxy: " + query);
-        boolean allSucceeded = true;
+        boolean success = true;
 
         for (DatabaseConnectionWrapper connection : loadBalancer.getDatabaseConnections()) {
             if (!connection.executeUpdate(query)) {
-                allSucceeded = false;
+                success = false;
             }
         }
-        return allSucceeded;
+        return success;
     }
 
     private List<String> executeQuery(String query) {

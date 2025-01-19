@@ -93,14 +93,13 @@ public class DatabaseConnectionWrapper {
         }
     }
 
-    /*
-    * Returns false when the connection is not valid. Connection is queued.
-    */
     public boolean executeUpdate(String query) {
 
         if (!isUp) {
             queries.add(query);
-            return false;
+
+            // make sense?
+            return true;
         }
 
         // execute actual query
@@ -115,10 +114,6 @@ public class DatabaseConnectionWrapper {
         return true;
     }
 
-    /*
-     * Executes a SELECT query and returns the ResultSet.
-     * If the query fails, it returns null.
-     */
     public List<String> executeQuery(String query) {
         logger.info("Executing query: " + query + " on database " + recognizableName);
 

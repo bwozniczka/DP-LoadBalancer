@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 import com.loadbalancer.connection.DatabaseConnectionManagerFacade;
 import com.loadbalancer.connection.DatabaseConnectionWrapper;
+import com.loadbalancer.logger.LoggerPanelFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory;
 //****************************
 
 public class LoadBalancer {
-    private static Logger logger = LoggerFactory.getLogger(LoadBalancer.class);
+    private static Logger logger = LoggerPanelFactory.getLogger(LoadBalancer.class);
     
     private DatabaseConnectionManagerFacade databaseManager;
     private LoadBalancingStrategy strategy;
