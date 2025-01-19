@@ -150,4 +150,8 @@ public class DatabaseConnectionWrapper {
     public String getDatabaseName() {
         return recognizableName;
     }
+
+    public Connection getConnection() {
+        return connection;
+    }
 }
