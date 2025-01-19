@@ -26,14 +26,15 @@ public class DatabaseConnectionManagerFacade {
         connections = new ArrayList<>();
 
         scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(this::checkConnections, 10L, 10L, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::checkConnections, 10L, 5L, TimeUnit.SECONDS);
     }
 
     private void checkConnections() {
+        logger.info("Checking connections...");
         for (DatabaseConnectionWrapper connection : connections) {
             boolean isValid = connection.isConnectionValid();
             connection.setIsUp(isValid);
-            logger.info("Connection " + connection + " is " + (isValid ? "up" : "down"));
+            // logger.info("Connection " + connection + " is " + (isValid ? "up" : "down"));
 
             if (!isValid) {
                 connection.tryReconnect();
@@ -43,7 +44,7 @@ public class DatabaseConnectionManagerFacade {
 
     // mock function
     public void addSampleConnections() throws SQLException {
-        addConnection(DatabaseType.POSTGRESQL, "localhost", 5432, "db1", "user1", "password1");
+        addConnection(DatabaseType.POSTGRESQL, "localhost", 5431, "db1", "user1", "password1");
         addConnection(DatabaseType.POSTGRESQL, "localhost", 5433, "db2", "user2", "password2");
         addConnection(DatabaseType.POSTGRESQL, "localhost", 5434, "db3", "user3", "password3");
         addConnection(DatabaseType.POSTGRESQL, "localhost", 5435, "db4", "user4", "password4");

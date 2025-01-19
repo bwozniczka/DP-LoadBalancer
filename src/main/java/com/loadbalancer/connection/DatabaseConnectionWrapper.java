@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 
 import com.loadbalancer.logger.LoggerPanelFactory;
 
+import oracle.net.aso.q;
+
 import java.sql.Statement;
 
 public class DatabaseConnectionWrapper {
@@ -32,7 +34,7 @@ public class DatabaseConnectionWrapper {
         this.user = user;
         this.password = password;
         this.recognizableName = recognizableName;
-        this.isUp = true;
+        this.isUp = connection == null ? false : true;
         logger.info("DatabaseConnectionWrapper initialized with connection: " + connection);
     }
 
@@ -60,7 +62,7 @@ public class DatabaseConnectionWrapper {
 
             return true;
         } catch (SQLException e) {
-            logger.error("Can't reconnect (database probably still down): " + e.getMessage());
+            logger.error("Can't reconnect (database probably still down): " + recognizableName);
             return false;
         }
     }
@@ -79,6 +81,10 @@ public class DatabaseConnectionWrapper {
 
     public boolean isConnectionValid(){
         try {
+            if (connection == null){
+                return false;
+            }
+
             return connection.isValid(0);
         } catch (SQLException e) {
             logger.error("Error checking connection validity: " + e.getMessage());
@@ -91,6 +97,11 @@ public class DatabaseConnectionWrapper {
     * Returns false when the connection is not valid. Connection is queued.
     */
     public boolean executeUpdate(String query) {
+
+        if (!isUp) {
+            queries.add(query);
+            return false;
+        }
 
         // execute actual query
         try (Statement statement = connection.createStatement()) {
