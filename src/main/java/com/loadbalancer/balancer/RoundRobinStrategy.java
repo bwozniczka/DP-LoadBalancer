@@ -1,6 +1,7 @@
 package com.loadbalancer.balancer;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,8 @@ public class RoundRobinStrategy implements LoadBalancingStrategy {
     @Override
     public DatabaseConnectionWrapper chooseDatabase(List<DatabaseConnectionWrapper> databases) {
         if (databases.isEmpty()) {
-            throw new IllegalArgumentException("No databases available");
+            logger.error("No databases available");
+            throw new NoSuchElementException("No databases available");
         }
 
         DatabaseConnectionWrapper db;

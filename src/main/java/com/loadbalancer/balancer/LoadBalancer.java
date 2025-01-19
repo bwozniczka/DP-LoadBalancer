@@ -1,7 +1,7 @@
 package com.loadbalancer.balancer;
 
 import java.util.List;
-
+import java.util.NoSuchElementException;
 
 import com.loadbalancer.connection.DatabaseConnectionManagerFacade;
 import com.loadbalancer.connection.DatabaseConnectionWrapper;
@@ -43,8 +43,14 @@ public class LoadBalancer {
 
     // Method to get a database for SELECT operations based on the strategy
     public DatabaseConnectionWrapper getDatabaseConnection() {
-        DatabaseConnectionWrapper connection = strategy.chooseDatabase(databaseManager.getConnections());
-        logger.info("Chosen database connection: " + connection);
-        return connection;
+        try {
+            DatabaseConnectionWrapper connection = strategy.chooseDatabase(databaseManager.getConnections());
+            logger.info("Chosen database connection: " + connection);
+            return connection;
+        } catch (NoSuchElementException e) {
+            logger.error("Failed to choose a database: " + e.getMessage());
+            // Handle the exception, e.g., return null or throw a custom exception
+            return null;
+        }
     }
 }

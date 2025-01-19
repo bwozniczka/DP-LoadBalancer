@@ -45,6 +45,10 @@ public class DatabaseProxy {
     private List<String> executeQuery(String query) {
         logger.info("Executing select query through proxy: " + query);
         DatabaseConnectionWrapper connection = loadBalancer.getDatabaseConnection();
+        if (connection == null) {
+            logger.error("No available database connections to execute the query.");
+            return List.of("No available database connections to execute the query.");
+        }
         return connection.executeQuery(query);
     }
 }
