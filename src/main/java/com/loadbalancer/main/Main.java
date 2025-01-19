@@ -1,30 +1,42 @@
 package com.loadbalancer.main;
 
-import com.loadbalancer.facade.DatabaseFacade;
 import java.sql.SQLException;
-import java.sql.Connection;
+import java.util.List;
+import java.util.Scanner;
+
+import javax.swing.SwingUtilities;
+
+import org.slf4j.Logger;
+
+import com.loadbalancer.balancer.LoadBalancer;
+import com.loadbalancer.balancer.RoundRobinStrategy;
+import com.loadbalancer.connection.DatabaseConnectionManagerFacade;
+import com.loadbalancer.logger.LoggerPanelFactory;
+import com.loadbalancer.proxy.DatabaseProxy;
 
 public class Main {
-    public static void main(String[] args) {
-        DatabaseFacade databaseFacade = new DatabaseFacade();
+    private static Logger logger = LoggerPanelFactory.getLogger(Main.class);
 
-        try {
-            // Inicjalizacja połączeń
-            databaseFacade.connect();
-            System.out.println("Połączono z bazami danych!");
+    public static void main(String[] args) throws SQLException, InterruptedException {
+        DatabaseConnectionManagerFacade databaseFacade = new DatabaseConnectionManagerFacade();
+        databaseFacade.addSampleConnections();
+        
+        RoundRobinStrategy roundRobinStrategy = new RoundRobinStrategy();
 
-            // Przykładowe użycie połączeń
-            Connection postgres1 = databaseFacade.getPostgresConnection1();
-            Connection postgres2 = databaseFacade.getPostgresConnection2();
-            Connection mysql = databaseFacade.getMysqlConnection();
+        LoadBalancer loadBalancer = LoadBalancer.getInstance();
+        loadBalancer.initialize(roundRobinStrategy, databaseFacade);
+        logger.info("LoadBalancer initialized successfully.");
 
-            System.out.println("Połączenia gotowe do użycia!");
+        DatabaseProxy databaseProxy = new DatabaseProxy(loadBalancer);
 
-        } catch (SQLException e) {
-            System.err.println("Błąd podczas łączenia z bazami danych: " + e.getMessage());
-        } finally {
-            databaseFacade.close();
-            System.out.println("Zamknięto połączenia.");
-        }
+        // // ---------------- Below are operations on databases ----------------
+        // databaseProxy.execute("INSERT INTO Users (username, password, email) VALUES ('user1', 'pass1', 'user1@example.com')");
+        // databaseProxy.execute("DELETE FROM Users");
+
+        // Create and display the main frame
+        SwingUtilities.invokeLater(() -> {
+            MainFrame mainFrame = new MainFrame(databaseFacade, databaseProxy);
+            mainFrame.setVisible(true);
+        });
     }
 }
